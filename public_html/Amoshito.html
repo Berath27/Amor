@@ -147,7 +147,7 @@
                 }
 
                 #tulipan {
-                    width: 200px;
+                    width: 350px;
                 }
             }
         </style>
@@ -171,7 +171,7 @@
         <!-- 🌷 Imagen del tulipán -->
         <img id="tulipan" src="https://cdn-icons-png.flaticon.com/512/2952/2952902.png" alt="Tulipán">
 
-<script>
+    <script>
     const canvas = document.getElementById('galaxyCanvas');
     const ctx = canvas.getContext('2d');
     let width, height;
@@ -334,7 +334,7 @@
             x: Math.random() * petalosCanvas.width,
             y: -20,
             size: 4 + Math.random() * 6, // pétalos más pequeños
-            speedY: 0.2 + Math.random() * 0.4,
+            speedY: 0.4 + Math.random() * 0.8,
             angle: Math.random() * Math.PI * 2,
             swing: Math.random() * 1.2 + 0.5,
             rotateSpeed: Math.random() * 0.015 + 0.003,
@@ -371,7 +371,7 @@
         setInterval(() => {
             if (petalos.length < 30) // menos pétalos visibles
                 petalos.push(crearPetalo());
-        }, 300); // cae más espaciado
+        }, 400); // cae más espaciado
         animarPetalos();
     }
 </script>
