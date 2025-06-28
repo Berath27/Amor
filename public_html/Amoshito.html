@@ -135,21 +135,29 @@
                 }
             }
 
-            /* 📱 Ajustes responsive adicionales */
+            /* ✅ Centramos el mensaje y el corazón en móviles */
             @media (max-width: 600px) {
-                #clickButton {
-                    padding: 0.8em 1.5em;
-                    font-size: 1rem;
+                body {
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
+                    padding: 0;
+                }
+
+                .contenedor-mensaje {
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0;
                 }
 
                 #mensaje {
-                    font-size: 1.1rem;
-                }
-
-                #tulipan {
-                    width: 350px;
+                    position: relative;
+                    top: 0;
+                    left: 0;
+                    transform: none;
                 }
             }
+
         </style>
     </head>
 
@@ -171,209 +179,207 @@
         <!-- 🌷 Imagen del tulipán -->
         <img id="tulipan" src="https://cdn-icons-png.flaticon.com/512/2952/2952902.png" alt="Tulipán">
 
-    <script>
-    const canvas = document.getElementById('galaxyCanvas');
-    const ctx = canvas.getContext('2d');
-    let width, height;
+        <script>
+            const canvas = document.getElementById('galaxyCanvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
 
-    function resizeCanvas() {
-        const dpr = window.devicePixelRatio || 1;
-        const w = window.innerWidth;
-        const h = window.innerHeight;
+            const isMobile = window.innerWidth <= 600;
 
-        canvas.width = w * dpr;
-        canvas.height = h * dpr;
-        canvas.style.width = w + "px";
-        canvas.style.height = h + "px";
+            function resizeCanvas() {
+                const dpr = isMobile ? 1 : (window.devicePixelRatio || 1);
+                const w = window.innerWidth;
+                const h = window.innerHeight;
 
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.scale(dpr, dpr);
+                canvas.width = w * dpr;
+                canvas.height = h * dpr;
+                canvas.style.width = w + "px";
+                canvas.style.height = h + "px";
 
-        width = w;
-        height = h;
-    }
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.scale(dpr, dpr);
 
-    window.addEventListener('resize', resizeCanvas);
-    window.addEventListener('orientationchange', resizeCanvas);
-
-    window.addEventListener('load', () => {
-        resizeCanvas();
-        startParticles();
-    });
-
-    const stars = Array.from({length: 200}, () => ({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        radius: Math.random() * 1.5 + 0.5,
-        speed: Math.random() * 0.3 + 0.2,
-        alpha: Math.random() * 0.5 + 0.5
-    }));
-
-    let particles = [];
-    let showHeart = false;
-    let time = 0;
-
-    function createHeartParticles() {
-        particles = [];
-        for (let t = 0; t < Math.PI * 2; t += 0.01) {
-            const x = 16 * Math.pow(Math.sin(t), 3);
-            const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-            particles.push({
-                baseX: x,
-                baseY: y,
-                size: Math.random() * 2 + 1,
-                angleOffset: Math.random() * 100
-            });
-        }
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, width, height);
-
-        for (let star of stars) {
-            star.y += star.speed;
-            if (star.y > height) {
-                star.y = 0;
-                star.x = Math.random() * width;
-            }
-            star.alpha += (Math.random() - 0.5) * 0.02;
-            star.alpha = Math.min(Math.max(star.alpha, 0.3), 1);
-            ctx.beginPath();
-            ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
-            ctx.fill();
-        }
-
-        if (showHeart) {
-            time += 0.008;
-            const beat = 1 + Math.sin(time) * 0.2;
-            const centerX = width / 2;
-            const centerY = height / 2;
-
-            for (let p of particles) {
-                const angle = time + p.angleOffset;
-                const offsetX = Math.cos(angle) * 2;
-                const offsetY = Math.sin(angle) * 2;
-
-                const x = centerX + (p.baseX * beat + offsetX) * 10;
-                const y = centerY + (p.baseY * beat + offsetY) * 10;
-
-                ctx.beginPath();
-                ctx.arc(x, y, p.size, 0, Math.PI * 2);
-                ctx.shadowColor = "rgba(255, 0, 0, 0.9)";
-                ctx.shadowBlur = 20;
-                ctx.fillStyle = "rgba(255, 0, 0, 1)";
-                ctx.fill();
+                width = w;
+                height = h;
             }
 
-            ctx.shadowBlur = 0;
-        }
+            window.addEventListener('resize', resizeCanvas);
+            window.addEventListener('orientationchange', resizeCanvas);
 
-        requestAnimationFrame(animate);
-    }
-
-    function startParticles() {
-        stars.length = 0;
-        for (let i = 0; i < 200; i++) {
-            stars.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                radius: Math.random() * 1.5 + 0.5,
-                speed: Math.random() * 0.3 + 0.2,
-                alpha: Math.random() * 0.5 + 0.5
+            window.addEventListener('load', () => {
+                resizeCanvas();
+                startParticles();
             });
-        }
-    }
 
-    animate();
+            const stars = [];
 
-    document.getElementById("clickButton").addEventListener("click", () => {
-        showHeart = true;
-        createHeartParticles();
-        document.getElementById("clickButton").style.display = "none";
+            let particles = [];
+            let showHeart = false;
+            let time = 0;
 
-        setTimeout(() => {
-            document.getElementById("mensaje").style.display = "block";
-        }, 2000);
+            function createHeartParticles() {
+                particles = [];
+                const step = isMobile ? 0.05 : 0.01;
+                for (let t = 0; t < Math.PI * 2; t += step) {
+                    const x = 16 * Math.pow(Math.sin(t), 3);
+                    const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                    particles.push({
+                        baseX: x,
+                        baseY: y,
+                        size: Math.random() * 2 + 1,
+                        angleOffset: Math.random() * 100
+                    });
+                }
+            }
 
-        setTimeout(() => {
-            const tulipan = document.getElementById("tulipan");
-            tulipan.style.display = "block";
-            tulipan.style.animation = "none";
-            tulipan.offsetHeight;
-            tulipan.style.animation = "crecerTulipan 8s ease-out forwards, brisa 3s ease-in-out infinite";
-            tulipan.style.animationDelay = "0s, 8s";
-        }, 4000);
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
 
-        setTimeout(() => {
-            iniciarPetalos();
-        }, 12000);
-    });
+                for (let star of stars) {
+                    star.y += star.speed;
+                    if (star.y > height) {
+                        star.y = 0;
+                        star.x = Math.random() * width;
+                    }
+                    star.alpha += (Math.random() - 0.5) * 0.02;
+                    star.alpha = Math.min(Math.max(star.alpha, 0.3), 1);
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                    ctx.fill();
+                }
 
-    // 🌼 Pétalos vectoriales
-    const petalosCanvas = document.getElementById("petalosCanvas");
-    const pCtx = petalosCanvas.getContext("2d");
-    let petalos = [];
+                if (showHeart) {
+                    time += 0.008;
+                    const beat = 1 + Math.sin(time) * 0.2;
+                    const centerX = width / 2;
+                    const centerY = height / 2;
 
-    function resizePetalos() {
-        petalosCanvas.width = window.innerWidth;
-        petalosCanvas.height = window.innerHeight;
-    }
+                    for (let p of particles) {
+                        const angle = time + p.angleOffset;
+                        const offsetX = Math.cos(angle) * 2;
+                        const offsetY = Math.sin(angle) * 2;
 
-    window.addEventListener("resize", resizePetalos);
-    resizePetalos();
+                        const x = centerX + (p.baseX * beat + offsetX) * 10;
+                        const y = centerY + (p.baseY * beat + offsetY) * 10;
 
-    const coloresPetalos = [
-        "rgba(255, 192, 203, 0.8)",
-        "rgba(255, 230, 0, 0.8)",
-        "rgba(135, 206, 250, 0.8)"
-    ];
+                        ctx.beginPath();
+                        ctx.arc(x, y, p.size, 0, Math.PI * 2);
+                        ctx.shadowColor = "rgba(255, 0, 0, 0.9)";
+                        ctx.shadowBlur = isMobile ? 6 : 20; // Menos blur en móvil
+                        ctx.fillStyle = "rgba(255, 0, 0, 1)";
+                        ctx.fill();
+                    }
 
-    function crearPetalo() {
-        return {
-            x: Math.random() * petalosCanvas.width,
-            y: -20,
-            size: 4 + Math.random() * 6, // pétalos más pequeños
-            speedY: 0.4 + Math.random() * 0.8,
-            angle: Math.random() * Math.PI * 2,
-            swing: Math.random() * 1.2 + 0.5,
-            rotateSpeed: Math.random() * 0.015 + 0.003,
-            color: coloresPetalos[Math.floor(Math.random() * coloresPetalos.length)]
-        };
-    }
+                    ctx.shadowBlur = 0;
+                }
 
-    function dibujarPetalo(p) {
-        pCtx.save();
-        pCtx.translate(p.x, p.y);
-        pCtx.rotate(p.angle);
-        pCtx.beginPath();
-        pCtx.moveTo(0, 0);
-        pCtx.bezierCurveTo(p.size, -p.size * 0.5, p.size * 0.5, -p.size, 0, -p.size * 1.5);
-        pCtx.bezierCurveTo(-p.size * 0.5, -p.size, -p.size, -p.size * 0.5, 0, 0);
-        pCtx.fillStyle = p.color;
-        pCtx.fill();
-        pCtx.restore();
-    }
+                requestAnimationFrame(animate);
+            }
 
-    function animarPetalos() {
-        pCtx.clearRect(0, 0, petalosCanvas.width, petalosCanvas.height);
-        petalos.forEach(p => {
-            p.y += p.speedY;
-            p.x += Math.sin(p.y * 0.01) * p.swing * 0.3;
-            p.angle += p.rotateSpeed;
-            dibujarPetalo(p);
-        });
-        petalos = petalos.filter(p => p.y < petalosCanvas.height + 50);
-        requestAnimationFrame(animarPetalos);
-    }
+            function startParticles() {
+                stars.length = 0;
+                const totalStars = isMobile ? 80 : 200;
+                for (let i = 0; i < totalStars; i++) {
+                    stars.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        radius: Math.random() * 1.5 + 0.5,
+                        speed: Math.random() * 0.3 + 0.2,
+                        alpha: Math.random() * 0.5 + 0.5
+                    });
+                }
+            }
 
-    function iniciarPetalos() {
-        setInterval(() => {
-            if (petalos.length < 30) // menos pétalos visibles
-                petalos.push(crearPetalo());
-        }, 400); // cae más espaciado
-        animarPetalos();
-    }
-</script>
-   </body>
+            animate();
+
+            document.getElementById("clickButton").addEventListener("click", () => {
+                showHeart = true;
+                createHeartParticles();
+                document.getElementById("clickButton").style.display = "none";
+
+                setTimeout(() => {
+                    document.getElementById("mensaje").style.display = "block";
+                }, 2000);
+
+                setTimeout(() => {
+                    const tulipan = document.getElementById("tulipan");
+                    tulipan.style.display = "block";
+                    tulipan.style.animation = "none";
+                    tulipan.offsetHeight;
+                    tulipan.style.animation = "crecerTulipan 8s ease-out forwards, brisa 3s ease-in-out infinite";
+                    tulipan.style.animationDelay = "0s, 8s";
+                }, 4000);
+
+                setTimeout(() => {
+                    iniciarPetalos();
+                }, 12000);
+            });
+
+            // 🌼 Pétalos vectoriales
+            const petalosCanvas = document.getElementById("petalosCanvas");
+            const pCtx = petalosCanvas.getContext("2d");
+            let petalos = [];
+
+            function resizePetalos() {
+                petalosCanvas.width = window.innerWidth;
+                petalosCanvas.height = window.innerHeight;
+            }
+
+            window.addEventListener("resize", resizePetalos);
+            resizePetalos();
+
+            const coloresPetalos = [
+                "rgba(255, 192, 203, 0.8)",
+                "rgba(255, 230, 0, 0.8)",
+                "rgba(135, 206, 250, 0.8)"
+            ];
+
+            function crearPetalo() {
+                return {
+                    x: Math.random() * petalosCanvas.width,
+                    y: -20,
+                    size: 4 + Math.random() * 6,
+                    speedY: 0.4 + Math.random() * 0.8,
+                    angle: Math.random() * Math.PI * 2,
+                    swing: Math.random() * 1.2 + 0.5,
+                    rotateSpeed: Math.random() * 0.015 + 0.003,
+                    color: coloresPetalos[Math.floor(Math.random() * coloresPetalos.length)]
+                };
+            }
+
+            function dibujarPetalo(p) {
+                pCtx.save();
+                pCtx.translate(p.x, p.y);
+                pCtx.rotate(p.angle);
+                pCtx.beginPath();
+                pCtx.moveTo(0, 0);
+                pCtx.bezierCurveTo(p.size, -p.size * 0.5, p.size * 0.5, -p.size, 0, -p.size * 1.5);
+                pCtx.bezierCurveTo(-p.size * 0.5, -p.size, -p.size, -p.size * 0.5, 0, 0);
+                pCtx.fillStyle = p.color;
+                pCtx.fill();
+                pCtx.restore();
+            }
+
+            function animarPetalos() {
+                pCtx.clearRect(0, 0, petalosCanvas.width, petalosCanvas.height);
+                petalos.forEach(p => {
+                    p.y += p.speedY;
+                    p.x += Math.sin(p.y * 0.01) * p.swing * 0.3;
+                    p.angle += p.rotateSpeed;
+                    dibujarPetalo(p);
+                });
+                petalos = petalos.filter(p => p.y < petalosCanvas.height + 50);
+                requestAnimationFrame(animarPetalos);
+            }
+
+            function iniciarPetalos() {
+                setInterval(() => {
+                    if (petalos.length < 30)
+                        petalos.push(crearPetalo());
+                }, 400);
+                animarPetalos();
+            }
+        </script>
+    </body>
 </html>
